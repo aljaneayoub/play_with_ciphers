@@ -38,8 +38,7 @@ for block in blocks:
     enc_block=cipher.encrypt(block)
     enc_text+=enc_block
     
-print(enc_text)
-text=enc_text.replace("\\",)
+enc_text=b'\xbf\xf9}H\x06\xb9\xc9\xb4\xb7,<]2\xeak[DcI\xe2O\xc7q\x9b\xc8\xf9\xef\xef\x883`\xc5^\x8a\x0c\x8e\x99\xc9\xaa\xab\xdf\xb6\xe2\xa4\xd2\xc3r<'
 
 deciphertext = b''
 for i in range(0,len(enc_text),blocksize):
