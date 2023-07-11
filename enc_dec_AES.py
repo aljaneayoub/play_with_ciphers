@@ -1,6 +1,6 @@
 import argparse
 from Crypto.Cipher import AES 
-from Crypto.Util.Padding import pad
+from Crypto.Util.Padding import pad,unpad
 from Crypto.Random import random
 
 
@@ -12,7 +12,7 @@ def main():
     parser.add_argument("-e", "--encode", help="Use for encoding plaintext", action='store_true')
     parser.add_argument("-d", "--decode", help="Use for decoding ciphertext", action='store_true')
     parser.add_argument("-m", "--mode", help="Specify AES mode", type=str.upper)
-    parser.add_argument("-t", "--text", help="Input text", type=str.upper)
+    parser.add_argument("-t", "--text", help="Input text", type=str)
     parser.add_argument("-f", "--file", help="Input file", type=argparse.FileType('r'))
     args = parser.parse_args()
 
@@ -43,6 +43,7 @@ def main():
         print("you need to choose the input between file '-f' or text '-f' ")
 
     if args.mode:
+        key=b"This is a 128bit"
         if args.mode == 'ECB':
             cipher_ECB=AES.new(key,AES.MODE_ECB)
 
@@ -63,20 +64,35 @@ def main():
                 enc_block=cipher_CBC.encrypt(block)
             cipher_enc+=enc_block
     
-        print(f"encrypted text : {cipher_enc}")
-    
-    
-    elif args.decode:
-        print("The parameter is decoding")
+        print(f"{cipher_enc}")
 
 
 
-    else :
-        print("you need to choose between encode '-e' or decode '-d'")
+    if args.decode:
+        if args.file:
+            file=args.file
+            ciphertext=file.read()
+            print(ciphertext)
+            ciphertext = ciphertext.encode("utf-8")
+            print(ciphertext)
 
+        elif args.text:
+            ciphertext = args.text.encode("utf-8")
+            ciphertext = ciphertext.decode('unicode_escape').encode('latin-1')
 
-    if args.file:
-        print("The input file is:", args.file)
+        else:
+            print("You need to provide the ciphertext either through a file or as text input")
+
+        blocksize = AES.block_size
+        deciphertext = b''
+        for i in range(0,len(ciphertext),blocksize):
+            block=ciphertext[i:i+blocksize]
+            dec_block=cipher_ECB.decrypt(block)
+            deciphertext+=dec_block
+            
+
+        unpadding_plaintext=unpad(deciphertext,blocksize)
+        print(unpadding_plaintext)
 
 if __name__ == '__main__':
     main()
